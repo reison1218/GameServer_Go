@@ -64,7 +64,7 @@ func initTcpServer(address string){
 
 var ID uint32 = 8
 
-func startRead(serverHandler *ServerHandler){
+func startRead(map *map[uint32]ServerHandler,serverHandler *ServerHandler){
 	data:=make([]byte,2014)
 	var conn = serverHandler.conn
 	for{
@@ -74,6 +74,7 @@ func startRead(serverHandler *ServerHandler){
 		}
 		if size == 0{
 			serverHandler.onClose()
+			delete(map,serverHandler.token)
 			return
 		}
 		serverHandler.onMessage(data)

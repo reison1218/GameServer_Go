@@ -29,19 +29,19 @@ func typeof(v interface{}) {
 
 }
 func main() {
-	 //var c = make(chan int)
-	 //go testSend(c)
-	 //testRec(c)
-	 //initTcpServer("127.0.0.1:8080")
-	//initTcpClient()
+	var c = make(chan int)
+	go testSend(c)
+	testRec(c)
+	initTcpServer("127.0.0.1:8080")
+	initTcpClient()
 
-	var wait sync.WaitGroup
-	wait.Add(999999)
-	var start = time.Now()
-	testMutex(&wait)
-	wait.Wait()
-	var end = time.Now()
-	fmt.Println("耗时：",end.Sub(start))
+	//var wait sync.WaitGroup
+	//wait.Add(999999)
+	//var start = time.Now()
+	//testMutex(&wait)
+	//wait.Wait()
+	//var end = time.Now()
+	//fmt.Println("耗时：",end.Sub(start))
 }
 
 func testMutex(wait *sync.WaitGroup){
