@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net"
+	"sync"
 	"time"
 )
 
@@ -44,7 +45,7 @@ func initTcpServer(address string){
 	tcpServer:=new(TcpServer)
 	tcpServer.tcpLister = tcplistener
 	tcpServer.tcpConnMap = make(map[uint32]ServerHandler)
-
+	var lock  sync.Mutex
 	fmt.Println("start Listen",tcpServer.tcpLister.Addr())
 	for{
 		tcpConn,error:=tcpServer.tcpLister.AcceptTCP()
@@ -58,13 +59,13 @@ func initTcpServer(address string){
 		serverHandler.onOpen(tcpConn)
 		tcpServer.tcpConnMap[ID] = serverHandler
 		tcpConnRes := tcpServer.tcpConnMap[ID]
-		go startRead(&tcpConnRes)
+		go startRead(tcpServer.tcpConnMap,&tcpConnRes,&lock)
 	}
 }
 
 var ID uint32 = 8
 
-func startRead(map *map[uint32]ServerHandler,serverHandler *ServerHandler){
+func startRead(handlerMap map[uint32]ServerHandler,serverHandler *ServerHandler,lock *sync.Mutex){
 	data:=make([]byte,2014)
 	var conn = serverHandler.conn
 	for{
@@ -74,7 +75,9 @@ func startRead(map *map[uint32]ServerHandler,serverHandler *ServerHandler){
 		}
 		if size == 0{
 			serverHandler.onClose()
-			delete(map,serverHandler.token)
+			lock.Lock()
+			delete(handlerMap,serverHandler.token)
+			lock.Unlock()
 			return
 		}
 		serverHandler.onMessage(data)

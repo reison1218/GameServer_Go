@@ -28,12 +28,25 @@ func typeof(v interface{}) {
 	fmt.Printf("type is: %T\n", v)
 
 }
+func testDelete(t map[uint32]string){
+	delete(t,1)
+	fmt.Println("d",t)
+}
 func main() {
-	var c = make(chan int)
-	go testSend(c)
-	testRec(c)
-	initTcpServer("127.0.0.1:8080")
-	initTcpClient()
+	//var c = make(chan int)
+	//go testSend(c)
+	//testRec(c)
+	//initTcpServer("127.0.0.1:8080")
+	//initTcpClient()
+	a := time.Now().Nanosecond()
+	i := 1
+	for i < 10000000 {
+		i += i
+	}
+	println(`最终值：`, i)
+	println(`时间：`, time.Now().Nanosecond()-a, `纳秒`)
+
+
 
 	//var wait sync.WaitGroup
 	//wait.Add(999999)
