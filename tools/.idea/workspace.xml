@@ -1,7 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="82e325c7-4f29-45c2-a9b4-20c6b9f206ce" name="Default Changelist" comment="" />
+    <list default="true" id="82e325c7-4f29-45c2-a9b4-20c6b9f206ce" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LearnGoProject" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -15,10 +37,14 @@
     </option>
   </component>
   <component name="GOROOT" path="/usr/local/go" />
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
   <component name="GoLibraries">
     <option name="indexEntireGoPath" value="false" />
   </component>
   <component name="ProjectId" id="1ffd6McKCmiUyhsYQh0AZokPXq4" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -32,7 +58,7 @@
     <property name="configurable.Project.GOPATH.is.expanded" value="true" />
     <property name="go.import.settings.migrated" value="true" />
     <property name="go.sdk.automatically.set" value="true" />
-    <property name="last_opened_file_path" value="$USER_HOME$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="settings.editor.selected.configurable" value="preferences.sourceCode.Go" />
   </component>
   <component name="RunManager">
@@ -45,7 +71,7 @@
       <directory value="$PROJECT_DIR$" />
       <method v="2" />
     </configuration>
-    <configuration name="go build LearnGoProject/" type="GoApplicationRunConfiguration" factoryName="Go Application" nameIsGenerated="true">
+    <configuration name="tools/" type="GoApplicationRunConfiguration" factoryName="Go Application">
       <module name="tools" />
       <working_directory value="$PROJECT_DIR$" />
       <go_parameters value="-i" />
@@ -69,15 +95,31 @@
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
   <component name="WindowStateProjectService">
     <state x="2663" y="411" key="#GOPATH" timestamp="1604051767753">
       <screen x="2048" y="194" width="1920" height="1057" />
     </state>
     <state x="2663" y="411" key="#GOPATH/2048.194.1920.1057/0.23.2048.1086@2048.194.1920.1057" timestamp="1604051767753" />
-    <state x="2506" y="394" width="1071" height="740" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1604906761751">
+    <state x="2240" y="356" width="1071" height="812" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1605782564664">
       <screen x="2048" y="194" width="1920" height="1057" />
     </state>
-    <state x="2506" y="394" width="1071" height="740" key="#com.intellij.execution.impl.EditConfigurationsDialog/2048.194.1920.1057/0.23.2048.1086@2048.194.1920.1057" timestamp="1604906761751" />
+    <state x="2240" y="356" width="1071" height="812" key="#com.intellij.execution.impl.EditConfigurationsDialog/2048.194.1920.1057/0.23.2048.1086@2048.194.1920.1057" timestamp="1605782564664" />
+    <state x="2641" y="482" key="EnvironmentVariablesDialog" timestamp="1605782323274">
+      <screen x="2048" y="194" width="1920" height="1057" />
+    </state>
+    <state x="2641" y="482" key="EnvironmentVariablesDialog/2048.194.1920.1057/0.23.2048.1086@2048.194.1920.1057" timestamp="1605782323274" />
     <state width="1201" height="236" key="GridCell.Tab.0.bottom" timestamp="1605781355814">
       <screen x="2048" y="194" width="1920" height="1057" />
     </state>
@@ -131,7 +173,7 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="DlvLineBreakpoint">
-          <url>file://$PROJECT_DIR$/../tools/TcpServer.go</url>
+          <url>file://$PROJECT_DIR$/TcpServer.go</url>
           <line>101</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
