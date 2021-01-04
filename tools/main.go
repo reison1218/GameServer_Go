@@ -76,11 +76,16 @@ func calc_n(n int){
 		}
 	}
 	var end = time.Now()
-	println(end.Sub(start).Milliseconds())
+	println(",",end.Sub(start).Milliseconds(),"ms")
 }
 
 
 func main() {
+	calc_n(100)
+	calc_n(160)
+	calc_n(300)
+	calc_n(400)
+	calc_n(500)
 	calc_n(600)
 	//var size uint32 = 0
 	//var i uint32 = 2
