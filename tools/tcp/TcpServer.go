@@ -11,6 +11,13 @@ type TcpServer struct {
 	tcpConnMap map[uint32]*net.TCPConn
 }
 
+func newTcpServer(tcpLister *net.TCPListener,tcpConnMap map[uint32]*net.TCPConn) TcpServer{
+	var ts = new(TcpServer)
+	ts.tcpLister = tcpLister
+	ts.tcpConnMap = tcpConnMap
+	return *ts
+}
+
 type ServerHandlerTrigger interface {
 	clone() ServerHandlerTrigger
 	onMessage(bytes []byte)
@@ -32,7 +39,11 @@ func (serverHandler ServerHandler) onMessage(bytes []byte)  {
 	println("there is mess from client")
 	str:=string("hello client")
 	ss:=[]byte(str)
-	serverHandler.Conn.Conn.Write(ss)
+	var _,err = serverHandler.Conn.Conn.Write(ss)
+	if err!=nil{
+		fmt.Println(err)
+		return
+	}
 }
 
 func (serverHandler ServerHandler) onClose()  {
@@ -57,22 +68,21 @@ type TcpSession struct {
 
 func InitTcpServer(address string,serverHandler ServerHandlerTrigger){
 	tcpAddr, err := net.ResolveTCPAddr("tcp", address) //创建 tcpAddr数据
-	tcplistener, err := net.ListenTCP("tcp", tcpAddr)
+	tcpListener, err := net.ListenTCP("tcp", tcpAddr)
 	if err !=nil{
 		fmt.Println(err)
 		return
 	}
-	tcpServer:=new(TcpServer)
-	tcpServer.tcpLister = tcplistener
-	tcpServer.tcpConnMap = make(map[uint32]*net.TCPConn)
+
+	tcpServer:=newTcpServer(tcpListener,make(map[uint32]*net.TCPConn))
 
 	var lock  sync.Mutex
 	fmt.Println("start Listen",tcpServer.tcpLister.Addr())
 	handlerMap := make(map[uint32]*ServerHandlerTrigger)
 	for{
-		tcpConn,error:=tcpServer.tcpLister.AcceptTCP()
-		if error !=nil{
-			fmt.Println(error)
+		tcpConn,err:=tcpServer.tcpLister.AcceptTCP()
+		if err !=nil{
+			fmt.Println(err)
 			continue
 		}
 		fmt.Println("there is new tcpClient coming",tcpConn.RemoteAddr())
@@ -96,8 +106,9 @@ func startRead(token uint32,connMap map[uint32]*net.TCPConn,handerMap map[uint32
 	handler := handerMap[token]
 	ss:=*handler
 	for{
-		size,error := conn.Read(data)
-		if error !=nil{
+		size,err := conn.Read(data)
+		if err !=nil{
+			fmt.Println(err)
 			return
 		}
 		if size == 0{
