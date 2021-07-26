@@ -12,8 +12,8 @@ var (
 	vname2 string
 )
 
-func test(data *UserData){
-	data.userId+=100
+func test(data *UserData) {
+	data.userId += 100
 }
 
 func checkError(err error) {
@@ -23,14 +23,13 @@ func checkError(err error) {
 	}
 }
 
-
 func typeof(v interface{}) {
 	fmt.Printf("type is: %T\n", v)
 
 }
-func testDelete(t map[uint32]string){
-	delete(t,1)
-	fmt.Println("d",t)
+func testDelete(t map[uint32]string) {
+	delete(t, 1)
+	fmt.Println("d", t)
 }
 
 const NUM_PRIMES uint32 = 50000
@@ -38,9 +37,9 @@ const NUM_PRIMES uint32 = 50000
 func sieve(v *[NUM_PRIMES]uint32, n *uint32, s *uint32) {
 	var i uint32 = 0
 	for i < *s {
-		if *n % v[i] == 0 {
+		if *n%v[i] == 0 {
 			*n++
-			sieve(v, n ,s)
+			sieve(v, n, s)
 			return
 		}
 		i++
@@ -49,25 +48,25 @@ func sieve(v *[NUM_PRIMES]uint32, n *uint32, s *uint32) {
 	*s++
 }
 
-func calc_n(n int){
-	print("N=",n)
-	var ans int= 0
-	var r1,r2,r3,r4,r5,r6 int
+func calc_n(n int) {
+	print("N=", n)
+	var ans int = 0
+	var r1, r2, r3, r4, r5, r6 int
 	var start = time.Now()
-	for a1:= range make([]int,(n>>3)+1){
-		r1=n-a1
-		for a2:=range make([]int,(r1/7)+1){
-			r2=r1-a2
-			for a3:=range make([]int,(r2/6)+1){
-				r3=r2-a3
-				for a4:=range make([]int,(r3/5)+1){
-					r4=r3-a4
-					for a5:=range make([]int,(r4>>2)+1){
-						r5=r4-a5
-						for a6:=range make([]int,(r5/3)+1){
-							r6=r5-a6
-							for a7:=range make([]int,(r6>>1)+1){
-								ans+=a1^a2^a3^a4^a5^a6^a7^(r6-a7)
+	for a1 := range make([]int, (n>>3)+1) {
+		r1 = n - a1
+		for a2 := range make([]int, (r1/7)+1) {
+			r2 = r1 - a2
+			for a3 := range make([]int, (r2/6)+1) {
+				r3 = r2 - a3
+				for a4 := range make([]int, (r3/5)+1) {
+					r4 = r3 - a4
+					for a5 := range make([]int, (r4>>2)+1) {
+						r5 = r4 - a5
+						for a6 := range make([]int, (r5/3)+1) {
+							r6 = r5 - a6
+							for a7 := range make([]int, (r6>>1)+1) {
+								ans += a1 ^ a2 ^ a3 ^ a4 ^ a5 ^ a6 ^ a7 ^ (r6 - a7)
 							}
 						}
 					}
@@ -76,9 +75,8 @@ func calc_n(n int){
 		}
 	}
 	var end = time.Now()
-	println(",",end.Sub(start).Milliseconds(),"ms")
+	println(",", end.Sub(start).Milliseconds(), "ms")
 }
-
 
 func main() {
 	calc_n(100)
@@ -121,8 +119,6 @@ func main() {
 	//println(`最终值：`, i)
 	//println(`时间：`, time.Now().Nanosecond()-a, `纳秒`)
 
-
-
 	//var wait sync.WaitGroup
 	//wait.Add(999999)
 	//var start = time.Now()
@@ -132,47 +128,46 @@ func main() {
 	//fmt.Println("耗时：",end.Sub(start))
 }
 
-func testMutex(wait *sync.WaitGroup){
-	var lock  sync.Mutex
-	var j  = new(Test)
-	for i:=0;i<999999;i++{
-		go add(j,&lock,wait)
+func testMutex(wait *sync.WaitGroup) {
+	var lock sync.Mutex
+	var j = new(Test)
+	for i := 0; i < 999999; i++ {
+		go add(j, &lock, wait)
 	}
 }
 
 type Test struct {
 	i int32
 }
-func add(j *Test,lock *sync.Mutex,wait *sync.WaitGroup){
+
+func add(j *Test, lock *sync.Mutex, wait *sync.WaitGroup) {
 	lock.Lock()
 	var i int32 = 0
-	for ;i<100;i++{
-		j.i+=i
+	for ; i < 100; i++ {
+		j.i += i
 	}
 	lock.Unlock()
 	wait.Done()
 }
 
-func testSend(c chan int){
+func testSend(c chan int) {
 	var startRecTime = time.Now()
-	for i:= 0;i< 999999;i++{
-		c<-1
+	for i := 0; i < 999999; i++ {
+		c <- 1
 	}
 	var endRecTime = time.Now()
-	fmt.Println("send take time:",endRecTime.Sub(startRecTime))
+	fmt.Println("send take time:", endRecTime.Sub(startRecTime))
 }
 
-func testRec(c chan int){
+func testRec(c chan int) {
 	var startRecTime = time.Now()
 	var res int = 0
-	for i := range c{
-		res+=i
-		if res >= 999999{
+	for i := range c {
+		res += i
+		if res >= 999999 {
 			break
 		}
 	}
 	var endRecTime = time.Now()
-	fmt.Println("rec take time:",endRecTime.Sub(startRecTime)," i:",res)
+	fmt.Println("rec take time:", endRecTime.Sub(startRecTime), " i:", res)
 }
-
-
