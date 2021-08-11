@@ -1,5 +1,9 @@
 package template
 
+import (
+	"time"
+)
+
 type Template interface {
 }
 
@@ -16,12 +20,25 @@ type TemplatesMgr struct {
 }
 
 func (mgr TemplatesMgr) Init() {
-	// dir, err := ioutil.ReadDir("/Users/tangjian/Desktop/test")
+	// tempDir, err := ioutil.ReadDir("/Users/tangjian/Desktop/test")
 	// if err != nil {
 	// 	println(err)
 	// 	return
 	// }
-	// for _, fs := range dir {
 
+	// for _, file := range jsonDir {
+	// 	path := "/Users/tangjian/Desktop/test/" + file.Name()
+	// 	bytes, err := ioutil.ReadFile(path)
+	// 	if err != nil {
+	// 		println(err)
+	// 		continue
+	// 	}
+	// 	str := string(bytes)
+	// 	json.Unmarshal([]byte(s), &province)
+	// 	println(str)
 	// }
+	now := time.Now().UTC()
+	res, _ := time.ParseDuration("9999999s")
+	now2 := now.Add(res)
+	println(now2.String())
 }

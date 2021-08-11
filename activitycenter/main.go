@@ -1,11 +1,13 @@
 package main
 
 import (
+	"activitycenter/redis"
 	"activitycenter/template"
 )
 
 func main() {
-	initTemplates()
+	//initTemplates()
+	redis.RedisTest()
 }
 
 func initTemplates() {
