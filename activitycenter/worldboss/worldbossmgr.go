@@ -9,6 +9,7 @@ import (
 
 	"github.com/gomodule/redigo/redis"
 	jsoniter "github.com/json-iterator/go"
+	"github.com/robfig/cron/v3"
 )
 
 var WorldBossGlobalMgr WorldBossMgr
@@ -75,10 +76,24 @@ func Init() {
 		}
 		redisHelper.Do("hset", "world_boss", worldBossInfo.CterId, string(jsonRes))
 	}
-	WorldBossGlobalMgr.WorldBossInfo = worldBossInfo
 
-	sleepTime, _ := time.ParseDuration("2000ms")
-	time.AfterFunc(sleepTime, check_update)
+	WorldBossGlobalMgr.WorldBossInfo = worldBossInfo
+	timer := newWithSeconds()
+	go func() {
+		for {
+			res := worldBossInfo.NextUpdateTime - worldBossInfo.LastUpdateTime
+			sleepTime := strconv.FormatInt(res, 10)
+			spec := "*/" + sleepTime + " * * * * ?"
+			id, _ := timer.AddFunc(spec, check_update)
+			timer.Start()
+			//让协程等待200ms让任务执行完
+			res += 200
+			time.Sleep(time.Duration(res) * time.Millisecond)
+			//删掉任务，从新执行
+			timer.Remove(id)
+			continue
+		}
+	}()
 }
 
 func check_update() {
@@ -105,4 +120,10 @@ func check_update() {
 	redisHelper.Do("hset", "world_boss", worldBossInfo.CterId, string(jsonRes))
 	//通知游戏服务器worldboss更新
 	http.Get("http://127.0.0.1:9999/update_world_boss")
+}
+
+func newWithSeconds() *cron.Cron {
+	secondParser := cron.NewParser(cron.Second | cron.Minute |
+		cron.Hour | cron.Dom | cron.Month | cron.DowOptional | cron.Descriptor)
+	return cron.New(cron.WithParser(secondParser), cron.WithChain())
 }

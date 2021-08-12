@@ -16,6 +16,7 @@ func main() {
 	initSeason()
 	//初始化worldboss
 	initWorldBoss()
+	select {}
 }
 
 func initTemplates() {
