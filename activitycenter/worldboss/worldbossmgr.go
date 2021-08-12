@@ -104,5 +104,5 @@ func check_update() {
 	}
 	redisHelper.Do("hset", "world_boss", worldBossInfo.CterId, string(jsonRes))
 	//通知游戏服务器worldboss更新
-	http.Get("http://127.01.0.1:9999/update_world_boss")
+	http.Get("http://127.0.0.1:9999/update_world_boss")
 }
