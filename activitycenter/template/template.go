@@ -1,44 +1,58 @@
 package template
 
 import (
-	"time"
+	"io/ioutil"
+
+	jsoniter "github.com/json-iterator/go"
 )
+
+var TemplateGlobalMgr TemplatesMgr
 
 type Template interface {
 }
 
 type TemplateMgr interface {
-	getById(id uint32) Template
+	GetById(id int) Template
 
-	isEmpty() bool
+	IsEmpty() bool
 
-	clear()
+	Clear()
 }
 type TemplatesMgr struct {
-	SessionMgr   SessionTemplateMgr
+	SeasonMgr    SeasonTemplateMgr
 	WorldBossMgr WorldBossTemplateMgr
 }
 
-func (mgr TemplatesMgr) Init() {
-	// tempDir, err := ioutil.ReadDir("/Users/tangjian/Desktop/test")
-	// if err != nil {
-	// 	println(err)
-	// 	return
-	// }
+func (mgr *TemplatesMgr) Init() {
+	tempDir, err := ioutil.ReadDir("/Users/tangjian/Desktop/json")
+	if err != nil {
+		println(err)
+		return
+	}
 
-	// for _, file := range jsonDir {
-	// 	path := "/Users/tangjian/Desktop/test/" + file.Name()
-	// 	bytes, err := ioutil.ReadFile(path)
-	// 	if err != nil {
-	// 		println(err)
-	// 		continue
-	// 	}
-	// 	str := string(bytes)
-	// 	json.Unmarshal([]byte(s), &province)
-	// 	println(str)
-	// }
-	now := time.Now().UTC()
-	res, _ := time.ParseDuration("9999999s")
-	now2 := now.Add(res)
-	println(now2.String())
+	for _, file := range tempDir {
+		fileName := file.Name()
+		path := "/Users/tangjian/Desktop/json/" + fileName
+		bytes, err := ioutil.ReadFile(path)
+		if err != nil {
+			println(err)
+			continue
+		}
+
+		if fileName == "Season.json" {
+			var seasonTemps []SeasonTemplate
+			err := jsoniter.Unmarshal(bytes, &seasonTemps)
+			if err != nil {
+				println(err)
+			}
+			mgr.SeasonMgr.init(seasonTemps)
+		} else if fileName == "WorldBoss.json" {
+			var worldBossTemps []WorldBossTemplate
+			err := jsoniter.Unmarshal(bytes, &worldBossTemps)
+			if err != nil {
+				println(err)
+			}
+			mgr.WorldBossMgr.init(worldBossTemps)
+		}
+	}
 }
