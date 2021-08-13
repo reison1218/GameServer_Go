@@ -3,6 +3,7 @@ package season
 import (
 	"activitycenter/redis_helper"
 	"activitycenter/template"
+	"log"
 	"time"
 
 	"github.com/gomodule/redigo/redis"
@@ -22,7 +23,7 @@ type SeasonInfo struct {
 }
 
 type SeasonMgr struct {
-	SeasonMap map[int]SeasonInfo
+	SeasonInfo SeasonInfo
 }
 
 func Init() {
@@ -75,9 +76,10 @@ func Init() {
 		redisHelper.Do("hset", "game_season", "101", string(jsonRes))
 	}
 	SeasonGlobalMgr = newSeasonMgr()
-	SeasonGlobalMgr.SeasonMap[seasonInfo.GameId] = seasonInfo
+	SeasonGlobalMgr.SeasonInfo = seasonInfo
+	log.Println("season init success!")
 }
 
 func newSeasonMgr() SeasonMgr {
-	return SeasonMgr{SeasonMap: make(map[int]SeasonInfo)}
+	return SeasonMgr{}
 }

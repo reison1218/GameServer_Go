@@ -2,6 +2,7 @@ package template
 
 import (
 	"io/ioutil"
+	"log"
 
 	jsoniter "github.com/json-iterator/go"
 )
@@ -55,4 +56,5 @@ func (mgr *TemplatesMgr) Init() {
 			mgr.WorldBossMgr.init(worldBossTemps)
 		}
 	}
+	log.Println("template init success!")
 }

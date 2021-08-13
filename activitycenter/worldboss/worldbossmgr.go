@@ -3,6 +3,7 @@ package worldboss
 import (
 	"activitycenter/redis_helper"
 	"activitycenter/template"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -94,6 +95,7 @@ func Init() {
 			continue
 		}
 	}()
+	log.Println("world_boss init success!")
 }
 
 func check_update() {

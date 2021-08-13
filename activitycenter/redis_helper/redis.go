@@ -1,7 +1,9 @@
 package redis_helper
 
 import (
+	"activitycenter/config_helper"
 	"fmt"
+	"log"
 
 	"github.com/gomodule/redigo/redis"
 )
@@ -26,14 +28,17 @@ func RedisTest() {
 	defer reidsClient.Close()
 }
 
-func Init() redis.Conn {
-	reidsClient, err := redis.DialURL("redis://127.0.0.1:6379")
+func Init() {
+	reidsAddress := config_helper.Configuration.Configs["redis_add"]
+	reidsPass := config_helper.Configuration.Configs["redis_pass"]
+	reidsClient, err := redis.DialURL(reidsAddress.String())
 	if err != nil {
 		panic(err)
 	}
-	_, err = reidsClient.Do("auth", "reison")
+	_, err = reidsClient.Do("auth", reidsPass.String())
 	if err != nil {
 		panic(err)
 	}
-	return reidsClient
+	RedisGlobalHelper = reidsClient
+	log.Println("redis_client init success!")
 }
