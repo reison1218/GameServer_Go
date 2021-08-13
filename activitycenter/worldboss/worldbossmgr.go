@@ -75,7 +75,7 @@ func Init() {
 		if err != nil {
 			panic(err)
 		}
-		redisHelper.Do("hset", "world_boss", worldBossInfo.CterId, string(jsonRes))
+		redisHelper.Do("hset", "world_boss", "101", string(jsonRes))
 	}
 
 	WorldBossGlobalMgr.WorldBossInfo = worldBossInfo
@@ -119,7 +119,7 @@ func check_update() {
 	if err != nil {
 		panic(err)
 	}
-	redisHelper.Do("hset", "world_boss", worldBossInfo.CterId, string(jsonRes))
+	redisHelper.Do("hset", "world_boss", "101", string(jsonRes))
 	//通知游戏服务器worldboss更新
 	http.Get("http://127.0.0.1:9999/update_world_boss")
 }

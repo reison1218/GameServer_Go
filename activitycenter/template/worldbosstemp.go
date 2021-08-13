@@ -4,6 +4,7 @@ type WorldBossTemplate struct {
 	CterId   int   `json:"cter_id"`
 	KeepTime int64 `json:"keep_time"`
 	MapIds   []int `json:"map_ids"`
+	RobotId  int   `json:"robot_id"`
 }
 
 type WorldBossTemplateMgr struct {

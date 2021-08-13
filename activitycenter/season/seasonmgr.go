@@ -4,10 +4,13 @@ import (
 	"activitycenter/redis_helper"
 	"activitycenter/template"
 	"log"
+	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gomodule/redigo/redis"
 	jsoniter "github.com/json-iterator/go"
+	"github.com/robfig/cron/v3"
 )
 
 var SeasonGlobalMgr SeasonMgr
@@ -38,12 +41,14 @@ func Init() {
 	nowTime := time.Now().UTC()
 	seasonInfo := SeasonInfo{}
 	needUpdate := false
+	var template template.SeasonTemplate
 	//执行初始化
 	if len(res) == 0 {
 		seasonInfo.GameId = 101
 		seasonInfo.Round = 1
 		seasonInfo.SeasonId = 1001
 		needUpdate = true
+		template = templateMgr.SeasonMgr.GetById(1001)
 	} else {
 		//如果没有就判断是否过期了没
 		redisData := res[1]
@@ -54,7 +59,7 @@ func Init() {
 		}
 		if nowTime.Unix() >= seasonInfo.NextUpdateTime {
 			nextSeasonId := seasonInfo.SeasonId
-			template := templateMgr.SeasonMgr.GetById(nextSeasonId + 1)
+			template = templateMgr.SeasonMgr.GetById(nextSeasonId + 1)
 			if template.Id == 0 {
 				nextSeasonId = 1001
 			}
@@ -66,9 +71,9 @@ func Init() {
 	if needUpdate {
 		seasonInfo.LastUpdateTime = nowTime.Unix()
 		seasonInfo.LastUpdateTimeStr = nowTime.String()
-		res, _ := time.ParseDuration("2160h")
-		seasonInfo.NextUpdateTime = nowTime.Add(res).Unix()
-		seasonInfo.NextUpdateTimeStr = nowTime.Add(res).String()
+		endTime := nowTime.Add(time.Duration(template.KeepTime) * time.Millisecond)
+		seasonInfo.NextUpdateTime = endTime.Unix()
+		seasonInfo.NextUpdateTimeStr = endTime.String()
 		jsonRes, err := jsoniter.Marshal(seasonInfo)
 		if err != nil {
 			panic(err)
@@ -77,9 +82,57 @@ func Init() {
 	}
 	SeasonGlobalMgr = newSeasonMgr()
 	SeasonGlobalMgr.SeasonInfo = seasonInfo
+	timer := newWithSeconds()
+	go func() {
+		for {
+			res := seasonInfo.NextUpdateTime - seasonInfo.LastUpdateTime
+			sleepTime := strconv.FormatInt(res, 10)
+			spec := "*/" + sleepTime + " * * * * ?"
+			id, _ := timer.AddFunc(spec, check_update)
+			timer.Start()
+			//让协程等待200ms让任务执行完
+			res += 200
+			time.Sleep(time.Duration(res) * time.Millisecond)
+			//删掉任务，从新执行
+			timer.Remove(id)
+			continue
+		}
+	}()
 	log.Println("season init success!")
 }
 
 func newSeasonMgr() SeasonMgr {
 	return SeasonMgr{}
+}
+
+func newWithSeconds() *cron.Cron {
+	secondParser := cron.NewParser(cron.Second | cron.Minute |
+		cron.Hour | cron.Dom | cron.Month | cron.DowOptional | cron.Descriptor)
+	return cron.New(cron.WithParser(secondParser), cron.WithChain())
+}
+
+func check_update() {
+	nowTime := time.Now().UTC()
+	templateMgr := template.TemplateGlobalMgr
+	redisHelper := redis_helper.RedisGlobalHelper
+	seasonInfo := SeasonGlobalMgr.SeasonInfo
+	if nowTime.Unix() < SeasonGlobalMgr.SeasonInfo.NextUpdateTime {
+		return
+	}
+	seasonId := seasonInfo.SeasonId
+	worldBossTemplate := templateMgr.SeasonMgr.GetNext(seasonId)
+	seasonInfo.SeasonId = worldBossTemplate.Id
+	seasonInfo.LastUpdateTime = nowTime.Unix()
+	seasonInfo.LastUpdateTimeStr = nowTime.String()
+	keepTime := strconv.FormatInt(worldBossTemplate.KeepTime, 10)
+	res, _ := time.ParseDuration(keepTime + "ms")
+	seasonInfo.NextUpdateTime = nowTime.Add(res).Unix()
+	seasonInfo.NextUpdateTimeStr = nowTime.Add(res).String()
+	jsonRes, err := jsoniter.Marshal(&seasonInfo)
+	if err != nil {
+		panic(err)
+	}
+	redisHelper.Do("hset", "game_season", 101, string(jsonRes))
+	//通知游戏服务器worldboss更新
+	http.Get("http://127.0.0.1:9999/update_season")
 }
