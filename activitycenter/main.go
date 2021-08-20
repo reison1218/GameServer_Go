@@ -4,7 +4,7 @@ import (
 	"activitycenter/config_helper"
 	"activitycenter/redis_helper"
 	"activitycenter/season"
-	"activitycenter/template"
+	"activitycenter/template_mgr"
 	"activitycenter/worldboss"
 	"log"
 	"time"
@@ -29,9 +29,9 @@ func main() {
 }
 
 func initTemplates() {
-	var a, b = template.NewSeasonTemplateMgr(), template.NewWorldBossTemplateMgr()
-	template.TemplateGlobalMgr = template.TemplatesMgr{SeasonMgr: a, WorldBossMgr: b}
-	tempMgr := template.TemplateGlobalMgr
+	var a, b = template_mgr.NewSeasonTemplateMgr(), template_mgr.NewWorldBossTemplateMgr()
+	template_mgr.TemplateGlobalMgr = template_mgr.TemplatesMgr{SeasonMgr: a, WorldBossMgr: b}
+	tempMgr := template_mgr.TemplateGlobalMgr
 	tempMgr.Init()
 }
 

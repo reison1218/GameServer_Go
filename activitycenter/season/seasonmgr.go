@@ -1,8 +1,9 @@
 package season
 
 import (
+	"activitycenter/config_helper"
 	"activitycenter/redis_helper"
-	"activitycenter/template"
+	"activitycenter/template_mgr"
 	"log"
 	"net/http"
 	"strconv"
@@ -30,7 +31,8 @@ type SeasonMgr struct {
 }
 
 func Init() {
-	templateMgr := template.TemplateGlobalMgr
+	gameId := config_helper.Configuration.Configs["game_id"]
+	templateMgr := template_mgr.TemplateGlobalMgr
 	redisHelper := redis_helper.RedisGlobalHelper
 	redisHelper.Do("select", 1)
 
@@ -41,10 +43,11 @@ func Init() {
 	nowTime := time.Now().UTC()
 	seasonInfo := SeasonInfo{}
 	needUpdate := false
-	var template template.SeasonTemplate
+	var template template_mgr.SeasonTemplate
 	//执行初始化
 	if len(res) == 0 {
-		seasonInfo.GameId = 101
+		res, _ := gameId.Int64()
+		seasonInfo.GameId = int(res)
 		seasonInfo.Round = 1
 		seasonInfo.SeasonId = 1001
 		needUpdate = true
@@ -112,8 +115,9 @@ func newWithSeconds() *cron.Cron {
 }
 
 func check_update() {
+	gameId := config_helper.Configuration.Configs["game_id"]
 	nowTime := time.Now().UTC()
-	templateMgr := template.TemplateGlobalMgr
+	templateMgr := template_mgr.TemplateGlobalMgr
 	redisHelper := redis_helper.RedisGlobalHelper
 	seasonInfo := SeasonGlobalMgr.SeasonInfo
 	if nowTime.Unix() < SeasonGlobalMgr.SeasonInfo.NextUpdateTime {
@@ -132,7 +136,17 @@ func check_update() {
 	if err != nil {
 		panic(err)
 	}
-	redisHelper.Do("hset", "game_season", 101, string(jsonRes))
+	redisHelper.Do("hset", "game_season", gameId.String(), string(jsonRes))
+	httpUrl := config_helper.Configuration.Configs["game_center_http"]
 	//通知游戏服务器worldboss更新
-	http.Get("http://127.0.0.1:9999/update_season")
+	httpRes, err := http.Get(httpUrl.String() + "update_season")
+	if err != nil {
+		println(err)
+		return
+	}
+	if httpRes.StatusCode == 200 {
+		println("notify game server update season success!")
+	} else {
+		println("notify game server update fail!")
+	}
 }

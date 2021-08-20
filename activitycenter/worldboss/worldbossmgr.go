@@ -2,7 +2,7 @@ package worldboss
 
 import (
 	"activitycenter/redis_helper"
-	"activitycenter/template"
+	"activitycenter/template_mgr"
 	"log"
 	"net/http"
 	"strconv"
@@ -34,7 +34,7 @@ func newWorldBossMgr() WorldBossMgr {
 func Init() {
 	WorldBossGlobalMgr = newWorldBossMgr()
 	//先加载reids
-	templateMgr := template.TemplateGlobalMgr
+	templateMgr := template_mgr.TemplateGlobalMgr
 	redisHelper := redis_helper.RedisGlobalHelper
 	nowTime := time.Now().UTC()
 	redisHelper.Do("select", 1)
@@ -44,7 +44,7 @@ func Init() {
 	}
 	worldBossInfo := WorldBossInfo{}
 	needUpdate := false
-	var worldBossTemplate template.WorldBossTemplate
+	var worldBossTemplate template_mgr.WorldBossTemplate
 	if len(res) == 0 {
 		worldBossTemplate = templateMgr.WorldBossMgr.GetFirst()
 		worldBossInfo.CterId = worldBossTemplate.CterId
@@ -100,7 +100,7 @@ func Init() {
 
 func check_update() {
 	nowTime := time.Now().UTC()
-	templateMgr := template.TemplateGlobalMgr
+	templateMgr := template_mgr.TemplateGlobalMgr
 	redisHelper := redis_helper.RedisGlobalHelper
 	worldBossInfo := WorldBossGlobalMgr.WorldBossInfo
 	if nowTime.Unix() < WorldBossGlobalMgr.WorldBossInfo.NextUpdateTime {
