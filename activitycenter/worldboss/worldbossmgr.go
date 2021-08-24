@@ -44,7 +44,7 @@ func Init() {
 	}
 	worldBossInfo := WorldBossInfo{}
 	needUpdate := false
-	var worldBossTemplate template_mgr.WorldBossTemplate
+	var worldBossTemplate *template_mgr.WorldBossTemplate
 	if len(res) == 0 {
 		worldBossTemplate = templateMgr.WorldBossMgr.GetFirst()
 		worldBossInfo.CterId = worldBossTemplate.CterId

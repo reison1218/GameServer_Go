@@ -1,5 +1,7 @@
 package template_mgr
 
+import "container/list"
+
 type WorldBossTemplate struct {
 	CterId   int   `json:"cter_id"`
 	KeepTime int64 `json:"keep_time"`
@@ -8,41 +10,51 @@ type WorldBossTemplate struct {
 }
 
 type WorldBossTemplateMgr struct {
-	templates map[int]WorldBossTemplate
+	templates *list.List
 }
 
-func (mgr *WorldBossTemplateMgr) GetFirst() WorldBossTemplate {
-	return mgr.templates[2001]
+func (mgr *WorldBossTemplateMgr) GetFirst() *WorldBossTemplate {
+	res := mgr.templates.Front().Value.(WorldBossTemplate)
+	return &res
 }
 
-func (mgr *WorldBossTemplateMgr) GetNext(cterId int) WorldBossTemplate {
-	res := mgr.templates[2001]
-	for _, i := range mgr.templates {
-		if i.CterId != cterId {
-			return i
+func (mgr *WorldBossTemplateMgr) GetNext(cterId int) *WorldBossTemplate {
+	for i := mgr.templates.Front(); i != nil; i = i.Next() {
+		temp := i.Value.(WorldBossTemplate)
+		if temp.CterId != cterId {
+			continue
 		}
+		mgr.templates.MoveToBack(i)
+		return &temp
 	}
-	return res
+	return nil
 }
 
 func NewWorldBossTemplateMgr() WorldBossTemplateMgr {
-	return WorldBossTemplateMgr{templates: make(map[int]WorldBossTemplate)}
+	return WorldBossTemplateMgr{templates: list.New()}
 }
 
-func (mgr *WorldBossTemplateMgr) GetById(id int) WorldBossTemplate {
-	return mgr.templates[id]
+func (mgr *WorldBossTemplateMgr) GetById(id int) *WorldBossTemplate {
+	for i := mgr.templates.Front(); i != nil; i = i.Next() {
+		temp := i.Value.(WorldBossTemplate)
+		if temp.CterId != id {
+			continue
+		}
+		return &temp
+	}
+	return nil
 }
 
 func (mgr *WorldBossTemplateMgr) IsEmpty() bool {
-	return len(mgr.templates) == 0
+	return mgr.templates.Len() == 0
 }
 
 func (mgr *WorldBossTemplateMgr) Clear() {
-	mgr.templates = make(map[int]WorldBossTemplate)
+	mgr.templates = list.New()
 }
 
 func (mgr *WorldBossTemplateMgr) init(temps []WorldBossTemplate) {
 	for _, temp := range temps {
-		mgr.templates[temp.CterId] = temp
+		mgr.templates.PushFront(temp)
 	}
 }

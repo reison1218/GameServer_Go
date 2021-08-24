@@ -1,5 +1,7 @@
 package template_mgr
 
+import "container/list"
+
 type SeasonTemplate struct {
 	Id       int   `json:"id"`
 	Element  int   `json:"element"`
@@ -7,37 +9,46 @@ type SeasonTemplate struct {
 }
 
 type SeasonTemplateMgr struct {
-	templates map[int]SeasonTemplate
+	templates *list.List
 }
 
-func (mgr *SeasonTemplateMgr) GetNext(id int) SeasonTemplate {
-	res := mgr.templates[2001]
-	for _, i := range mgr.templates {
-		if i.Id != id {
-			return i
+func (mgr *SeasonTemplateMgr) GetNext(id int) *SeasonTemplate {
+	for i := mgr.templates.Front(); i != nil; i = i.Next() {
+		temp := i.Value.(SeasonTemplate)
+		if temp.Id != id {
+			continue
 		}
+		mgr.templates.MoveToBack(i)
+		return &temp
 	}
-	return res
+	return nil
 }
 
 func NewSeasonTemplateMgr() SeasonTemplateMgr {
-	return SeasonTemplateMgr{templates: make(map[int]SeasonTemplate)}
+	return SeasonTemplateMgr{templates: list.New()}
 }
 
-func (mgr *SeasonTemplateMgr) GetById(id int) SeasonTemplate {
-	return mgr.templates[id]
+func (mgr *SeasonTemplateMgr) GetById(id int) *SeasonTemplate {
+	for i := mgr.templates.Front(); i != nil; i = i.Next() {
+		temp := i.Value.(SeasonTemplate)
+		if temp.Id != id {
+			continue
+		}
+		return &temp
+	}
+	return nil
 }
 
 func (mgr *SeasonTemplateMgr) IsEmpty() bool {
-	return len(mgr.templates) == 0
+	return mgr.templates.Len() == 0
 }
 
 func (mgr *SeasonTemplateMgr) Clear() {
-	mgr.templates = make(map[int]SeasonTemplate)
+	mgr.templates = list.New()
 }
 
 func (mgr *SeasonTemplateMgr) init(temps []SeasonTemplate) {
 	for _, temp := range temps {
-		mgr.templates[temp.Id] = temp
+		mgr.templates.PushFront(temp)
 	}
 }

@@ -43,7 +43,7 @@ func Init() {
 	nowTime := time.Now().UTC()
 	seasonInfo := SeasonInfo{}
 	needUpdate := false
-	var template template_mgr.SeasonTemplate
+	var template *template_mgr.SeasonTemplate
 	//执行初始化
 	if len(res) == 0 {
 		res, _ := gameId.Int64()
