@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gomodule/redigo/redis"
@@ -117,10 +118,11 @@ func newWithSeconds() *cron.Cron {
 func check_update() {
 	gameId := config_helper.Configuration.Configs["game_id"]
 	nowTime := time.Now().UTC()
-	templateMgr := template_mgr.TemplateGlobalMgr
+	templateMgr := &template_mgr.TemplateGlobalMgr
 	redisHelper := redis_helper.RedisGlobalHelper
-	seasonInfo := SeasonGlobalMgr.SeasonInfo
-	if nowTime.Unix() < SeasonGlobalMgr.SeasonInfo.NextUpdateTime {
+	seasonInfo := &SeasonGlobalMgr.SeasonInfo
+	nextUpdateTime := seasonInfo.NextUpdateTime
+	if nowTime.Unix() < nextUpdateTime {
 		return
 	}
 	seasonId := seasonInfo.SeasonId
@@ -136,17 +138,24 @@ func check_update() {
 	if err != nil {
 		panic(err)
 	}
-	redisHelper.Do("hset", "game_season", gameId.String(), string(jsonRes))
-	httpUrl := config_helper.Configuration.Configs["game_center_http"]
-	//通知游戏服务器worldboss更新
-	httpRes, err := http.Get(httpUrl.String() + "update_season")
+	jsonStr := string(jsonRes)
+	_, err = redisHelper.Do("select", 1)
 	if err != nil {
-		println(err)
-		return
+		panic(err)
 	}
-	if httpRes.StatusCode == 200 {
-		println("notify game server update season success!")
-	} else {
-		println("notify game server update fail!")
+	_, err = redisHelper.Do("hset", "game_season", gameId.String(), jsonStr)
+	if err != nil {
+		panic(err)
 	}
+	httpUrl := config_helper.Configuration.Configs["game_center_http"]
+	reader := strings.NewReader(jsonStr)
+	//通知游戏服务器赛季更新
+	resp, err := http.Post(httpUrl.String()+"/update_season", "application/x-www-form-urlencoded", reader)
+	if err != nil {
+		panic("update_season fail!")
+	}
+	if resp.StatusCode != 200 {
+		panic("update_season fail!")
+	}
+	log.Println("update_season success!")
 }

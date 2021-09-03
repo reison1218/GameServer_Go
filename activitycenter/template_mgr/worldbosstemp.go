@@ -21,7 +21,7 @@ func (mgr *WorldBossTemplateMgr) GetFirst() *WorldBossTemplate {
 func (mgr *WorldBossTemplateMgr) GetNext(cterId int) *WorldBossTemplate {
 	for i := mgr.templates.Front(); i != nil; i = i.Next() {
 		temp := i.Value.(WorldBossTemplate)
-		if temp.CterId != cterId {
+		if temp.CterId == cterId {
 			continue
 		}
 		mgr.templates.MoveToBack(i)
@@ -55,6 +55,6 @@ func (mgr *WorldBossTemplateMgr) Clear() {
 
 func (mgr *WorldBossTemplateMgr) init(temps []WorldBossTemplate) {
 	for _, temp := range temps {
-		mgr.templates.PushFront(temp)
+		mgr.templates.PushBack(temp)
 	}
 }

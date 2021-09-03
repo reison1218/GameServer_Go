@@ -1,11 +1,13 @@
 package worldboss
 
 import (
+	"activitycenter/config_helper"
 	"activitycenter/redis_helper"
 	"activitycenter/template_mgr"
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gomodule/redigo/redis"
@@ -34,7 +36,7 @@ func newWorldBossMgr() WorldBossMgr {
 func Init() {
 	WorldBossGlobalMgr = newWorldBossMgr()
 	//先加载reids
-	templateMgr := template_mgr.TemplateGlobalMgr
+	templateMgr := &template_mgr.TemplateGlobalMgr
 	redisHelper := redis_helper.RedisGlobalHelper
 	nowTime := time.Now().UTC()
 	redisHelper.Do("select", 1)
@@ -102,8 +104,9 @@ func check_update() {
 	nowTime := time.Now().UTC()
 	templateMgr := template_mgr.TemplateGlobalMgr
 	redisHelper := redis_helper.RedisGlobalHelper
-	worldBossInfo := WorldBossGlobalMgr.WorldBossInfo
-	if nowTime.Unix() < WorldBossGlobalMgr.WorldBossInfo.NextUpdateTime {
+	worldBossInfo := &WorldBossGlobalMgr.WorldBossInfo
+	nextUpdateTime := worldBossInfo.NextUpdateTime
+	if nowTime.Unix() <= nextUpdateTime {
 		return
 	}
 	cterId := worldBossInfo.CterId
@@ -119,9 +122,27 @@ func check_update() {
 	if err != nil {
 		panic(err)
 	}
-	redisHelper.Do("hset", "world_boss", "101", string(jsonRes))
+	jsonStr := string(jsonRes)
+	_, err = redisHelper.Do("select", 1)
+	if err != nil {
+		panic(err)
+	}
+	_, err = redisHelper.Do("hset", "world_boss", "101", jsonStr)
+	if err != nil {
+		panic(err)
+	}
+	reader := strings.NewReader(jsonStr)
+
+	httpUrl := config_helper.Configuration.Configs["game_center_http"]
 	//通知游戏服务器worldboss更新
-	http.Get("http://127.0.0.1:9999/update_world_boss")
+	resp, err := http.Post(httpUrl.String()+"/update_world_boss", "application/x-www-form-urlencoded", reader)
+	if err != nil {
+		panic("update_world_boss fail!")
+	}
+	if resp.StatusCode != 200 {
+		panic("update_world_boss fail!")
+	}
+	log.Println("update_world_boss success!")
 }
 
 func newWithSeconds() *cron.Cron {

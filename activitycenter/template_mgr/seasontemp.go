@@ -49,6 +49,6 @@ func (mgr *SeasonTemplateMgr) Clear() {
 
 func (mgr *SeasonTemplateMgr) init(temps []SeasonTemplate) {
 	for _, temp := range temps {
-		mgr.templates.PushFront(temp)
+		mgr.templates.PushBack(temp)
 	}
 }
