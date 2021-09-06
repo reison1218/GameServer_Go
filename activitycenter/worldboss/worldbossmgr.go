@@ -4,6 +4,7 @@ import (
 	"activitycenter/config_helper"
 	"activitycenter/redis_helper"
 	"activitycenter/template_mgr"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -62,6 +63,9 @@ func Init() {
 		if nowTime.Unix() >= worldBossInfo.NextUpdateTime {
 			needUpdate = true
 			worldBossTemplate = templateMgr.WorldBossMgr.GetNext(cterId)
+			if worldBossTemplate == nil {
+				panic(fmt.Sprintf("%s %d", "could not find worldbosstemplate! cterId:", cterId))
+			}
 			worldBossInfo.CterId = worldBossTemplate.CterId
 		}
 	}
