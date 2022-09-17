@@ -1,0 +1,266 @@
+syntax = "proto3";
+package protos;
+option go_package = "./;protos";
+import "proto_files/base.proto";
+
+// pub enum RoomState {
+//     AwaitConfirm = 0,  //等待进入 只有匹配模式才会有到壮体啊
+//     Await = 1,         //等待
+//     ChoiceIndex = 2,   //选择占位
+//     BattleStarted = 3, //战斗开始
+//     BattleOvered = 4,  //战斗结束
+// }
+
+// pub enum MemberState {
+//     AwaitConfirm = 0,
+//     NotReady = 1,
+//     Ready = 2,
+// }
+
+//创建房间请求
+//cmd:1006
+message C_CREATE_ROOM{
+    uint32 room_type = 1;//房间类型
+    RoomSettingPt setting = 2;//房间设置,只有自定义房间的时候需要传，其他房间类型不要传
+}
+
+//加入房间
+//cmd:1007
+message C_JOIN_ROOM{
+    uint32 room_id = 1;//房间id
+    uint32 room_type = 2;//房间类型
+}
+
+//快速开始
+//cmd:1008
+message C_SEARCH_ROOM{
+    uint32 room_type = 1;//房间类型
+}
+
+//房间协议返回，对应返回的有：1006，1007，1008
+//cmd:10006
+message S_ROOM{
+    bool is_succ = 1;//是否成功;
+    string err_mess = 2;//错误信息;
+    uint32 err_code = 3;//错误码;101:玩家已经在房间内   102:房间不存在   103:房间已开始 104:房间人满了
+    RoomPt room = 4;//房间数据
+}
+
+//房间设置请求
+//cmd:20011
+message C_ROOM_SETTING{
+    uint32 set_type = 1;//设定的类型 1:赛季开关 2:turn限制时间 3:AI 等级
+    int32 value = 2;//对应的值
+}
+
+//房间设置返回
+//cmd:10011
+message S_ROOM_SETTING{
+    bool is_succ = 1;//是否成功;
+    string err_mess = 2;//错误信息;
+}
+
+//离开房间
+//cmd:20004
+message C_LEAVE_ROOM{
+
+}
+
+//离开房间返回，当房间有人推出时，也会向其他人推送这个协议
+//cmd:10007
+message S_LEAVE_ROOM{
+    bool is_succ = 1;//是否成功;
+    string err_mess = 2;//错误信息;
+}
+
+//选择角色请求
+//cmd:20012
+message C_CHOOSE_CHARACTER{
+    uint32 cter_temp_id = 1;//选择的角色id
+}
+
+//选择角色返回
+//cmd:10014
+message S_CHOOSE_CHARACTER{
+    bool is_succ = 1;//是否成功;
+    string err_mess = 2;//错误信息;
+}
+
+//选择角色推送
+//cmd:10019
+message S_CHOOSE_CHARACTER_NOTICE{
+    uint32 user_id = 1;//玩家id;
+    uint32 cter_temp_id = 2;//选择的角色id
+}
+
+//选择技能
+//cmd:20014
+message C_CHOOSE_SKILL{
+    repeated uint32 skills= 1;//选择的角色的技能
+}
+
+//选择技能返回
+//cmd:10020
+message S_CHOOSE_SKILL{
+    bool is_succ = 1;//是否成功;
+    string err_mess = 2;//错误信息;
+    repeated uint32 skills= 3;//选择的角色的技能
+}
+
+//T人请求
+//cmd:20005
+message C_KICK_MEMBER{
+    uint32 target_id = 1;//要T掉的玩家目标id
+}
+
+//T人返回
+//cmd:10013
+message S_KICK_MEMBER{
+    bool is_succ = 1;//是否成功;
+    string err_mess = 2;//错误信息;
+}
+
+//换队伍
+//cmd:20006
+message C_CHANGE_TEAM{
+    uint32 target_team_id = 1;//想要换的队伍目标id
+}
+
+//换队伍通知
+//cmd:10009
+message S_CHANGE_TEAM_NOTICE{
+    uint32 user_id = 1;//玩家id
+    uint32 team_id = 2;//现在的队伍id
+}
+
+//准备与取消准备
+//cmd:20007
+message C_PREPARE_CANCEL{
+    bool prepare = 1;//true代表准备，false代表取消准备
+}
+
+//准备与取消返回
+//cmd:10010
+message S_PREPARE_CANCEL{
+    bool is_succ = 1;//是否成功;
+    string err_mess = 2;//错误信息;
+}
+
+//准备与取消通知
+//cmd:10021
+message S_PREPARE_CANCEL_NOTICE{
+    uint32 user_id = 1;
+    bool prepare = 2;//true代表准备，false代表取消准备
+}
+
+//开始游戏
+//cmd:20008
+message C_START{
+
+}
+
+//开始游戏返回
+//cmd:10008
+message S_START{
+    bool is_succ = 1;//是否成功;
+    string err_mess = 2;//错误信息;
+}
+
+//房间新成员推送消息
+//cmd:10012
+message S_ROOM_ADD_MEMBER_NOTICE{
+    uint32 index = 1;//成员位置
+    MemberPt member = 2;//成员数据
+}
+
+//房间变动推送
+//cmd:10015
+message S_ROOM_NOTICE{
+    uint32 owner_id = 1;//房主ID
+    RoomSettingPt setting = 2;//房间设置
+}
+
+//表情请求
+//cmd:20013
+message C_EMOJI{
+    uint32 emoji_id = 1;//表情符号id
+}
+
+//表情返回
+//cmd:10016
+message S_EMOJI{
+    bool is_succ = 1;//是否成功;
+    string err_mess = 2;//错误信息;
+}
+
+//表情推送
+//cmd:10017
+message S_EMOJI_NOTICE{
+    uint32 user_id = 1;//玩家id
+    uint32 emoji_id = 2;//表情id
+}
+
+//房间成员推送消息
+//cmd:10018
+message S_ROOM_MEMBER_LEAVE_NOTICE{
+    uint32 notice_type = 1;//类型 1:自己离开 2:被T出去
+    uint32 user_id = 2;//离开的玩家id
+}
+
+//匹配成功通知
+//cmd:10029
+message S_MATCH_SUCCESS_NOTICE{
+    uint32 count=1;//点击去人进入房间人的数量
+}
+
+//确认进入房间  此消息没有服务器不返回
+//cmd:20015
+message C_CONFIRM_INTO_ROOM{
+    bool confirm = 1;//false为不进入房间，true为确定进入房间
+}
+
+//确认进入房间推送
+//cmd:10061
+message S_CONFIRM_INTO_ROOM_NOTICE{
+    uint32 count=1;//点击去人进入房间人的数量
+}
+
+//进入房间取消通知  此消息没有任何数据内容
+//cmd:10028
+message S_INTO_ROOM_CANCEL_NOTICE{
+    
+}
+
+//取消匹配请求指令
+//cmd:20016
+message C_CANCEL_SEARCH{
+
+}
+
+//取消匹配返回指令
+//cmd:10060
+message S_CANCEL_SEARCH{
+
+}
+
+//匹配惩罚更新推送
+//cmd:10103
+message S_PUNISH_MATCH_NOTICE{
+    uint32 user_id = 1;//玩家id
+    PunishMatchPt punish_match = 2; //匹配惩罚
+}
+
+//选择ai角色请求
+//cmd:20018
+message C_CHOICE_AI{
+    uint32 index = 1;//对应的位置下标
+    uint32 robot_temp_id = 2;//机器人配置id
+}
+
+//选择ai角色通知
+//cmd:10201
+message S_CHOICE_AI_NOTICE{
+    uint32 index = 1;//对应的位置下标
+    uint32 robot_temp_id = 2;//对应AI的角色
+    uint32 user_id = 3;//对应AI的角色
+}

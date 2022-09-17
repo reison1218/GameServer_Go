@@ -1,0 +1,1 @@
+protoc --go_out=./protos/ ./proto_files/*.proto

@@ -1,0 +1,84 @@
+syntax = "proto3";
+package protos;
+option go_package = "./;protos";
+import "proto_files/base.proto";
+
+///房间服到战斗服-战斗开始
+message R_B_START{
+    RoomPt room_pt = 1;//房间数据
+}
+
+///游戏服务器发给房间服务器，创建房间
+message G_R_CREATE_ROOM{
+    uint32 room_type = 1;//房间类型
+    PlayerBattlePt pbp = 2;//玩家房间需要的数据
+    RoomSettingPt setting = 3;//房间设置,只有自定义房间的时候需要传，其他房间类型不要传
+}
+
+///游戏服务器发给房间服务器，加入房间
+message G_R_JOIN_ROOM{
+    uint32 room_id = 1;//房间id
+    uint32 room_type = 2;//房间类型
+    PlayerBattlePt pbp = 3;//玩家房间需要的数据
+}
+
+///游戏服务器发给房间服务器，快速开始
+message G_R_SEARCH_ROOM{
+    uint32 room_type = 1;//模式
+    PlayerBattlePt pbp = 2;//玩家房间需要的数据
+}
+
+///战斗服结算转发消息，发给游戏服，排行榜服
+message B_S_SUMMARY{
+    uint32 room_type = 1;//房间类型
+    repeated uint32 cters = 2;//使用排名前三的角色
+    SummaryDataPt summary_data = 3;//结算数据
+}
+
+///游戏服务器发给房间服务器，战斗结算
+message B_R_SUMMARY{
+    uint32 room_type = 1;//房间类型
+    uint32 room_id=2;//房间id
+}
+
+//玩家战斗数据封装proto
+message PlayerBattlePt{
+    uint32 user_id = 1;             //玩家id
+    string nick_name = 2;           //玩家昵称
+    uint32 grade = 3;//grade
+    uint32 grade_frame = 4;//grade像框
+    uint32 soul = 5;//灵魂头像
+    LeaguePt league = 6;            //段位数据
+    PunishMatchPt punish_match = 7; //匹配惩罚
+    repeated CharacterPt cters = 8; //玩家解锁的角色数组
+}
+
+///游戏服务器发给房间服务器，快速开始
+message B_R_G_PUNISH_MATCH{
+    PunishMatchPt punish_match = 1;//战斗服和房间服同步惩罚到游戏服
+}
+
+///排行榜服务器同步给游戏服排行榜信息
+message R_G_SYNC_RANK{
+}
+
+///通知游戏服更新上一赛季的排行榜数据
+message R_S_UPDATE_SEASON{
+    int32 season_id = 1;//赛季信息
+    uint32 round=2;//赛季round
+    uint64 next_update_time = 3;//下次更新时间
+}
+
+///游戏服通知其他服务器更新名字
+message G_S_MODIFY_NICK_NAME{
+    string nick_name = 1;           //玩家昵称
+}
+
+///更新worldboss推送
+message UPDATE_WORLD_BOSS_PUSH{
+    int32 world_boss_id = 1;//worldboss
+    uint64 next_update_time = 2;//下次更新时间
+}
+
+
+
